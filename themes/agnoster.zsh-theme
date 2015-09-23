@@ -126,6 +126,20 @@ prompt_git() {
   fi
 }
 
+prompt_svn() {
+  if svn_is_inside; then
+      ZSH_THEME_SVN_PROMPT_DIRTY='±'
+      local ref dirty
+      if svn_parse_dirty; then
+          dirty=$ZSH_THEME_SVN_PROMPT_DIRTY
+          prompt_segment yellow black
+      else
+          prompt_segment green black
+      fi
+      echo -n "$(svn_branch_name) $(svn_rev)$dirty"
+  fi
+}
+
 prompt_hg() {
   local rev status
   if $(hg id >/dev/null 2>&1); then
@@ -196,8 +210,11 @@ build_prompt() {
   prompt_context
   prompt_dir
   prompt_git
-  prompt_hg
+#  prompt_hg
+  prompt_svn
   prompt_end
 }
 
-PROMPT='%{%f%b%k%}$(build_prompt) '
+PROMPT='%{%f%b%k%}$(build_prompt)
+$SEGMENT_SEPARATOR '
+RPROMPT='[%*]'
